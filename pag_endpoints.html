@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moss | Dashboard Interativa</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="img/Moss.ico" type="image/x-icon" />
+
+    <!-- CSS API -->
+    <link rel="stylesheet" href="./css/pag_endpoints.css">
+
+    <!--CSS Sidebar -->
+    <link rel="stylesheet" href="./css/sidebar.css">
+      
+    <!-- Chart Imports -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+</head>
+<body>
+
+    <div class="main">
+        <div class="sidebar">
+            <p class="sidebar--logo">MOSS</p>
+            <ul class="sidebar--list">
+                <li onclick="location.href = './index.html'" class="active">API'S</li>
+                <li onclick="location.href = './pag_machines.html'">Máquinas</li>
+            </ul>
+        </div>
+
+        <div class="container fade-in">
+            <div class="api__card">
+                <div class="card--data">
+                    <div class="data__layout">
+                        <h2 id="card-title" class="card--title"> </h2>
+                        <smal id="card-baseurl" class="card--baseurl"></smal>
+                    </div>
+
+                    <div id="list_buttons" style="width: 100%; display:flex; flex-direction: row; justify-content: start; align-items: center;">
+                        <button class="button_add"> Adicionar novo endpoint</button>
+                    </div>
+
+                    <div class="data__layout">
+                        <p>STATUS <p id="api_status" style="color: green;">ONLINE</p></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="list_endpoints" class="list_endpoints">
+
+            </div>   
+
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+
+    window.onload = function() {
+        var apiHash = localStorage['apiHash'];
+        
+        const lista_apis = document.getElementById('apis_list');
+        let endpLista = document.getElementById('list_endpoints');
+
+        getData(`http://localhost:3333/api/${apiHash}`)
+        .then(data => {
+            let api = JSON.parse(data);
+
+            var card_title = document.getElementById('card-title');
+            var card_baseurl = document.getElementById('card-baseurl');
+            card_title.innerHTML = api.retorno.recordset[0].nome;
+            card_baseurl.innerHTML = api.retorno.recordset[0].website;
+        })
+        .catch(error => console.error('CATCH', error));
+
+        getData(`http://localhost:3333/api/${apiHash}/endpoint`)
+        .then(data => {
+            let endpoints = JSON.parse(data);
+            endpoints.retorno.recordset.forEach(endpoint => {
+
+                let endPContainer = document.createElement('div');
+                endPContainer.classList.add('endp_container');
+
+                let divSuccess = document.createElement('div');
+                let divErros = document.createElement('div');
+                let divStatus = document.createElement('div');
+                let divNull = document.createElement('div');
+
+                divSuccess.classList.add('numbers_endpoint');
+                divErros.classList.add('numbers_endpoint');
+                divStatus.classList.add('numbers_endpoint');
+                divNull.classList.add('numbers_endpoint');
+
+                let htSuccess = document.createElement('h3');
+                let htErros = document.createElement('h3');
+                let htStatus = document.createElement('h3');
+                let htNull = document.createElement('h3');
+
+                htSuccess.innerHTML = 'Requisições com sucesso (hoje)';
+                htErros.innerHTML = 'Requisições com erro <br> (hoje)';
+                htStatus.innerHTML = 'Status da rota (hoje)';
+                htNull.innerHTML = 'Tempo offline (hoje)';
+ 
+                let pSuccess = document.createElement('p');
+                let pErros = document.createElement('p');
+                let pStatus = document.createElement('p');
+                let pTOffline = document.createElement('p');
+
+                getData(`http://localhost:3333/eventos/${endpoint.idEndpoint}`)
+                .then(data => {
+                    let dataReadable = JSON.parse(data);
+
+                    pSuccess.innerHTML = dataReadable.count[0].positivosHoje;
+                    pErros.innerHTML = dataReadable.count[0].errosHoje;
+
+                    let errorCounter = 0;
+
+                    console.log(dataReadable);
+
+                    if (dataReadable.tempoOffline == '00h00') {
+                        pTOffline.innerHTML = '00h00';
+                    } else {
+                        dataReadable.tempoOffline.map((val, ind, arr) => {
+                            ind += 1;
+                            if (val.statusCode == 404) {
+                                if (val.statusCode == dataReadable.tempoOffline[ind - 1].statusCode) {
+                                    errorCounter++;
+                                }
+                            }
+                        });
+
+                        let minutes = (errorCounter * 5);
+                        if (minutes > 60) {
+                            let hours = Math.floor(minutes / 60);
+                            minutes = minutes % 60;
+
+                            let kek = hours + 'h';
+                            kek += minutes < 10 ? ('0' + minutes) : minutes;
+                            pTOffline.innerHTML = kek;
+                        } else {
+                            let kek = '00h';
+                            kek += minutes < 10 ? '0' + minutes : minutes;
+
+                            pTOffline.innerHTML = kek;
+                        }
+                    }
+
+                    if (dataReadable.tempoOffline[0].statusCode == 404) {
+                        pStatus.innerHTML = 'OFFLINE';
+                        pStatus.classList.add('numbers_stats');
+                        pStatus.classList.add('errors');
+                    } else {
+                        pStatus.innerHTML = 'ONLINE';
+                        pStatus.classList.add('numbers_stats');
+                        pStatus.classList.add('positives');
+                    }
+
+                    pSuccess.classList.add('positives');
+                    pSuccess.classList.add('numbers_stats');
+                    pErros.classList.add('errors');
+                    pErros.classList.add('numbers_stats');
+                    pTOffline.classList.add('numbers_stats');
+
+                    let smallSuccess = document.createElement('small');
+                    let smallErros = document.createElement('small');
+                    let smallStatus = document.createElement('small');
+                    let smallNull = document.createElement('small');
+
+                    divSuccess.appendChild(htSuccess);
+                    divErros.appendChild(htErros);
+                    divStatus.appendChild(htStatus);
+                    divNull.appendChild(htNull);
+
+                    divSuccess.appendChild(pSuccess);
+                    divErros.appendChild(pErros);
+                    divStatus.appendChild(pStatus);
+                    divNull.appendChild(pTOffline);
+
+                    divSuccess.appendChild(smallSuccess);
+                    divErros.appendChild(smallErros);
+                    divStatus.appendChild(smallStatus);
+                    divNull.appendChild(smallNull);
+
+                    endPContainer.appendChild(divSuccess);
+                    endPContainer.appendChild(divErros);
+                    endPContainer.appendChild(divStatus);
+                    endPContainer.appendChild(divNull);
+
+                    let cardEndA = document.createElement('div');
+                    let url = document.createElement('p');
+                    let graphWrapper = document.createElement('div');
+
+                    url.innerHTML = '<b style="color: black;">ENDPOINT:</b> ' + endpoint.url;
+
+                    cardEndA.classList.add('card__endpoint');
+                    url.classList.add('endpoint__url');
+                    url.classList.add('url__style');
+                    graphWrapper.classList.add('endpoint_grafico');
+
+                    cardEndA.appendChild(url);
+                    cardEndA.appendChild(graphWrapper);
+                    endpLista.appendChild(cardEndA);
+                    endpLista.appendChild(endPContainer);
+                    // graphWrapper.appendChild(graphReceiver);
+
+                    graphWrapper.id = 'chart' + endpoint.idEndpoint;
+                    addGraficoLines(graphWrapper, endpoint.idEndpoint);
+                });
+            });
+        });
+    }
+
+    function getData(url) {
+        return new Promise((resolve, reject) => {
+            let x = new XMLHttpRequest();
+            x.open('GET', url, false);
+            x.send(null);
+            
+            resolve(x.responseText);
+        });
+    }
+
+    function addGraficoLines(componente, endpointHash) {
+
+        let listaEndp = document.getElementById('list_endpoints');
+
+        this.lastIndexTemp = 0;
+        this.time = 0;
+
+        let graphFood = [];
+        
+        let graphPositives = [];
+        let horariosPositives = [];
+        
+        let graphErrors = [];
+        let horariosErrors = [];
+
+        function define_graph() {
+            getData(`http://localhost:3333/eventos/${endpointHash}`)
+            .then(data => {
+                let dataReadable = JSON.parse(data);
+
+                dataReadable.ge tResponse.forEach(register => {
+                    graphFood.push([
+                        register.timeAt.split('T')[1].split('.')[0],
+                        Number(register.statusCode) == 200 ? 200 : 0,
+                        Number(register.statusCode) == 404 ? 404 : 0,
+                    ]);
+                });
+                
+                graphFood = graphFood.slice(graphFood.length - 8, graphFood.length);
+                graphFood.unshift(['Horário', 'Sucesso', 'Erro']);
+
+                google.load("visualization", "1", {packages:["corechart"]});
+                google.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable(graphFood);
+
+                    var options = {
+                        vAxis: {
+                            title: 'Hours',
+                            ticks: [0, 100, 200, 300, 400, 500]
+                        },
+                        title: 'Ultimas requisições',
+                        xAxis: {
+                            title: 'Horário', titleTextStyle: {color: 'black'}
+                        }
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById(componente.id));
+                    chart.draw(data, options);
+                }
+            });
+        }
+
+        define_graph();
+        setInterval(() => {
+            define_graph();
+        }, 60000);
+    }
+</script>

@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+.container {
+    width: 100%;
+    width: calc(100% - 30rem);
+    background-color: #F1F2F8;
+    margin-left: 30rem;
+}
+
+.toolbar {
+    background-color: white;
+    box-shadow: 1px 1px 4px 2px rgb(194, 194, 194);
+    margin: 20px 30px;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+}
+
+.toolbar h2 {
+    margin-left: 5rem;
+    font-family: 'Montserrat';
+    font-weight: 400;
+    font-size: 2.2rem;
+}
+
+.toolbar--button {
+    height: 8rem;
+    padding: 10px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar--button img {
+    height: 3rem;
+}
+
+.toolbar--button a {
+    font-family: 'Roboto';
+    font-size: 1.6rem;
+    margin-top: 10px;
+}
+
+.apis_list {
+    margin: 20px 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 40px 20px;
+}
+
+.api__card {
+    background-color: white;
+    box-shadow: 1px 1px 4px 2px rgb(194, 194, 194);
+    padding: 10px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card--data {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.data__layout {
+    margin: 0px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.data__layout p {
+    font-size: 1.6rem;
+    font-family: 'Roboto';
+    font-weight: bold;
+}
+
+.card--title {
+    color: rgb(37, 37, 37);
+    font-family: 'Roboto';
+    font-weight: bold;
+    font-size: 3rem;
+    letter-spacing: 2px;
+}
+
+.card--baseurl {
+    color: #B2B2B2;
+    font-family: 'Roboto';
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.card--options {
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+.card--options a {
+    padding: 10px 0;
+    margin: 0 10px;
+    /* border: 1px solid #cccccc; */
+    background-color: #F1F2F8;
+    text-align: center;
+    font-family: 'Roboto';
+    font-size: 1.6rem;
+    box-shadow: 1px 1px 3px 1px rgb(194, 194, 194);
+    transition: .25s;
+}
+
+.card--options a:hover {
+    cursor: pointer;
+    background-color: #dfdfdf;
+}
+
+.ajs-header {
+    font-size: 2.6rem;
+    font-family: 'Roboto';
+}
+
+.ajs-content {
+    font-size: 1.8rem;
+    font-family: 'Roboto';
+}
+
+.ajs-message {
+    font-size: 1.8rem;
+    font-family: 'Roboto';
+    color: #FFF;
+} 
+
+/* ajs-success ajs-visible */
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn .25s linear;
+    animation-iteration-count: 1;
+}
+
+.fade-out {
+    animation: fadeOut .25s linear;
+    animation-iteration-count: 1;
+}

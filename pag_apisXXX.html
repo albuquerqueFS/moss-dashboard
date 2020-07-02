@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Moss | Dashboard Interativa</title>
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="img/Moss.ico" type="image/x-icon"/>
+
+  <!-- CSS API -->
+  <link rel="stylesheet" href="./css/pag_apis.css">
+  
+  <!--CSS Sidebar -->
+  <link rel="stylesheet" href="./css/sidebar.css">
+  
+  <!--Charts JS -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  
+  <!--Script JS -->
+  <script src="./js/script.js"></script>
+    
+  <script>
+        function onOff() {
+            document
+                .querySelector("#modal")
+                .classList
+                .toggle("hide")
+
+            document
+                .querySelector("body")
+                .classList
+                .toggle("hideScroll")
+
+            document
+                .querySelector("#modal")
+                .classList
+                .toggle("addScroll")
+        };
+
+        function checkFields(event) {
+            const valuesToCheck = [
+                "title",
+                "team",
+                "base_url",
+                "description"
+            ];
+
+            const isEmbpty = valuesToCheck.find(function (value) {
+            const checkIfIsString = typeof event.targer[value].value === "string"
+            const checkIfIsEmpty = !event.target[value].value.trim()
+                if (checkIfIsString && checkIfIsEmpty)
+                    return true
+            })
+
+                if (isEmpty) {
+                    event.preventDefault();
+                    alert(`Por favor, preencha todos os campos`)
+                }
+        }
+ </script>
+
+</head>
+<body>
+    
+    <div class="main">
+        <div class="sidebar">
+            <p class="sidebar--logo">MOSS</p>
+            <ul class="sidebar--list">
+                <li onclick="location.href = './pag_listaApis.html'" class="active">API'S</li>
+                <li onclick="location.href = './pag_statistics.html'">Estatísticas</li>
+               
+            </ul>
+        </div>
+
+        <div class="container">
+                <div class="menu">
+                        <p class="nome-api">API MOSS <br> <br>
+                            <label class="url-api">www.mos.com.br</label>
+                        </p>
+                    <button class="menu--button" onclick="onOff()">Meus endpoint´s</button>
+                    <button class="menu--button" onclick="mostrarX()">Novo endpoint </button>
+                    <button class="menu--button" onclick="mostrarY()">Deletar um endpoint </button> 
+                </div>
+            
+
+            <div class="container-grafico">
+                <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                <div id="chart_div"></div>
+                <div id="chart_div-2"></div>
+            </div>            
+        </div>
+    </div>
+
+    <div id="modal" class="hide">
+        <div class="content">
+            <h1>Nova API</h1> <br> <br>
+            <form method="POST" onsubmit="return checkFields(event)">   
+
+                <div class="input-wrapper">
+                    <label for="title">API</label>
+                    <input type="text" name="title">
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="image">Base URL</label>
+                    <input type="url" name="base_url">
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="description">Digite uma Descrição da API</label>
+                    <textarea name="description" cols="30" rows="10"></textarea>
+                </div>
+
+                <a href="#" onclick="onOff()">Voltar</a>
+                <button onclick="adicionar()">Adicionar</button>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

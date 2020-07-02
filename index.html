@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Moss | Dashboard Interativa</title>
+  
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="img/Moss.ico" type="image/x-icon"/>
+    
+    <!--CSS Sidebar -->
+    <link rel="stylesheet" href="./css/sidebar.css">
+  
+    <!-- CSS API -->
+    <link rel="stylesheet" href="./css/pag_apis.css">
+    
+    <!-- CSS Alertify -->
+    <link rel="stylesheet" href="./alertify/css/alertify.css">
+
+    <!--Charts JS -->
+    <!-- <script src="https://www.gstatic.com/charts/loader.js"></script> -->
+    
+    <!--Script JS -->
+    <!-- <script src="./js/script.js"></script> -->
+
+    <!-- Jquery -->
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+
+    <script src="./alertify/alertify.min.js"></script>    
+
+    <script>
+        function onOff() {
+            document
+                .querySelector("#modal")
+                .classList
+                .toggle("hide")
+
+            document
+                .querySelector("body")
+                .classList
+                .toggle("hideScroll")
+
+            document
+                .querySelector("#modal")
+                .classList
+                .toggle("addScroll")
+        };
+
+        function checkFields(event) {
+            const valuesToCheck = [
+                "title",
+                "team",
+                "base_url",
+                "description"
+            ];
+
+            const isEmbpty = valuesToCheck.find(function (value) {
+            const checkIfIsString = typeof event.targer[value].value === "string"
+            const checkIfIsEmpty = !event.target[value].value.trim()
+                if (checkIfIsString && checkIfIsEmpty)
+                    return true
+            })
+
+                if (isEmpty) {
+                    event.preventDefault();
+                    alert(`Por favor, preencha todos os campos`)
+                }
+        }
+    </script>
+    
+</head>
+<body>
+    
+    <div class="main">
+        <div class="sidebar">
+            <p class="sidebar--logo">MOSS</p>
+            <ul class="sidebar--list">
+                <li onclick="location.href = './index.html'" class="active">API'S</li>
+                <li onclick="location.href = './pag_machines.html'">Máquinas</li>
+            </ul>
+        </div>
+
+        <div id="container" class="container fade-in">
+            <div class="toolbar">
+
+                <h2>Suas aplicações cadastradas <span style="margin-left: 4rem;"> |</span></h2>
+
+                <div class="toolbar--button" onclick="onOff()">
+                    <img src="./img/icons/plus-square-solid.svg">
+                    <a class="button__text">Cadastrar nova api</a>
+                </div>
+
+            </div>
+
+            <div id="apis_list" class="apis_list">
+               
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modal" class="hide">
+        <div class="content">
+            <h1>Nova API</h1>
+            <br>
+            <form  >   
+
+                <div class="input-wrapper">
+                    <label for="title">API</label>
+                    <input id="api_titulo" type="text" name="title" placeholder="nome da api">
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="image">Base URL</label>
+                    <input id="api_baseURL" type="url" name="base_url" placeholder="http://exemplo.com">
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="description">Digite uma Descrição da API</label>
+                    <textarea name="description" cols="30" rows="10"></textarea>
+                </div>
+
+                <a onclick="onOff()">Voltar</a>
+                <button onclick="registrarAPI()">Adicionar</button>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    function requestApis() {
+        const lista_apis = document.getElementById('apis_list');
+        lista_apis.innerHTML = '';
+
+        var http = new XMLHttpRequest();
+        http.open('GET', 'http://localhost:3333/api', false);
+        http.send(null);
+
+        var obj = JSON.parse(http.responseText);
+
+        console.log(obj.retorno);
+
+        obj.retorno.recordset.forEach(api => {
+            console.log(api);
+            var apiCard = document.createElement('div');
+            var cardData = document.createElement('div');
+            var dataLayoutA = document.createElement('div');
+            var dataLayoutB = document.createElement('div');
+            var cardTitle = document.createElement('h2');
+            var cardBaseurl = document.createElement('small');
+            
+            var pText = document.createElement('p');
+            var pStatus = document.createElement('p');
+           
+            var cardOptions = document.createElement('div');
+            var aMyPoints = document.createElement('a');      
+            var aNewPoints = document.createElement('a');      
+            var aConfig = document.createElement('a'); 
+
+            dataLayoutA.appendChild(cardTitle);
+            dataLayoutA.appendChild(cardBaseurl);
+            dataLayoutB.appendChild(pText);
+
+            apiCard.appendChild(cardData);
+            cardData.appendChild(dataLayoutA);
+            cardData.appendChild(dataLayoutB);
+    
+            cardOptions.appendChild(aMyPoints);
+            cardOptions.appendChild(aNewPoints);
+            cardOptions.appendChild(aConfig);
+
+            apiCard.appendChild(cardOptions);
+
+            apiCard.classList.add('api__card');
+            cardData.classList.add('card--data');
+            dataLayoutA.classList.add('data__layout');
+            cardTitle.classList.add('card--title');
+            cardBaseurl.classList.add('card--baseurl');
+            dataLayoutB.classList.add('data__layout');
+            cardOptions.classList.add('card--options');
+
+            cardTitle.innerHTML = api.nome;
+            cardBaseurl.innerHTML = api.website;
+
+            pText.innerHTML = 'STATUS <p id="api_status" style="color: green;">ONLINE</p>';
+
+            aMyPoints.innerHTML = 'Meus endpoint\'s';
+            aNewPoints.innerHTML = 'Apagar endpoint';
+            aConfig.innerHTML = 'Configurações';
+
+            aMyPoints.onclick = function() { (mostrarEndpoints(api.appHash))() }
+            aNewPoints.onclick = function() { (deletarEndpoints(api.appHash))() }
+
+            lista_apis.appendChild(apiCard);
+        });
+    }
+
+    function mostrarEndpoints(hash) {
+        const lista_apis = document.getElementById('container');
+        lista_apis.classList.add('fade-out');
+        
+        localStorage['apiHash'] = hash;
+        document.location.href = './pag_endpoints.html';
+
+        setTimeout(() => {
+            lista_apis.style.opacity = 0;
+        }, 100);
+    }
+
+    function deletarEndpoints(hash) {
+        alertify.confirm("Deseja realmente deletar este endpoint?", 
+            () => {
+                alertify.success('Endpoint deletado com sucesso!');
+                
+                var http = new XMLHttpRequest();
+                http.open('DELETE', `http://localhost:3333/api/${hash}`, false);
+                http.send(null);
+
+                requestApis();
+            }, 
+            () => { });
+    }
+    
+    // http://localhost:3333/api/create/nome/site
+
+    function registrarAPI() {
+        var nomeAPI = document.getElementById('api_titulo').value;
+        var baseurlAPI = document.getElementById('api_baseURL').value;
+
+        var http = new XMLHttpRequest();
+        http.open('GET', `http://localhost:3333/api/create/${nomeAPI}/${encodeURIComponent(baseurlAPI)}`, false);
+        http.send(null);
+
+        var obj = JSON.parse(http.responseText);
+
+        console.log(obj);
+        console.log('OMEGALUL', decodeURIComponent(encodeURIComponent(baseurlAPI)));
+    
+        alertify.success('Aplicação cadastrada com sucesso!');
+        requestApis();
+    }
+
+    requestApis();
+
+</script>

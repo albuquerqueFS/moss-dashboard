@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Moss | Dashboard Interativa</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="img/Moss.ico" type="image/x-icon"/>
+
+    <!-- CSS API -->
+    <link rel="stylesheet" href="./css/pag_machines.css">
+    
+    <!-- CSS Sidebar -->
+    <link rel="stylesheet" href="./css/sidebar.css">
+
+    <!-- Chart Imports -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    
+    <!-- CSS API -->
+    <link rel="stylesheet" href="./css/pag_endpoints.css">
+
+</head>
+<body>
+    
+    <div class="main">
+        <div class="sidebar">
+            <p class="sidebar--logo">MOSS</p>
+            <ul class="sidebar--list">
+                <li onclick="location.href = './index.html'">API'S</li>
+                <li onclick="location.href = './pag_machines.html'" class="active">Máquinas</li>
+                
+            </ul>
+        </div>
+
+        <div class="container">
+            <div class="api__card">
+                <div class="card--data">
+                    <div class="data__layout">
+                        <h2 id="card-title" class="card--title" style="font-size: 3.6rem;">Suas máquinas</h2>
+                        <smal id="card-baseurl" class="card--baseurl">Online agora</smal>
+                    </div>
+
+                    <div class="data__layout">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="lista-maquinas" class="lista-maquinas">
+                <div id="card-maquina" class="card-maquina">
+
+                    <!-- labels -->
+                    <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+                        <h1 class="maquina-titulo">Máquina: oshi aws</h1>
+                        <p id="card_processador"></p>
+                    </div>
+
+                    <!-- graficos -->
+                    <div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    window.onload = function() {
+        
+        let lista_maquinas = document.getElementById('card-maquina');
+
+        let card = document.createElement('div');
+        let graficoCPU = document.createElement('div');
+        let graficoMEMORIA = document.createElement('div');
+        let graficoDISCO = document.createElement('div');
+
+        graficoCPU.classList.add('grafico-estilo');
+        graficoMEMORIA.classList.add('grafico-estilo');
+        graficoDISCO.classList.add('grafico-estilo');
+
+        card.classList.add('card-graficos');
+        
+        card.appendChild(graficoCPU);
+        card.appendChild(graficoMEMORIA);
+        card.appendChild(graficoDISCO);
+
+        graficoCPU.id =  'chartCPU';
+        graficoMEMORIA.id =  'chartMEMORIA';
+        graficoDISCO.id =  'chartDISCO';
+
+        lista_maquinas.appendChild(card);
+        addGraficoLines();
+
+        getData(`http://localhost:3333/maquina/infoMaquina`)
+        .then(data => {
+            let api = JSON.parse(data);
+            document.getElementById('card_processador').innerHTML = api.retorno.recordset[0].processador; 
+        })
+        .catch(error => console.error('CATCH', error));
+    }
+    
+    function getData(url) {
+        return new Promise((resolve, reject) => {
+            let x = new XMLHttpRequest();
+            x.open('GET', url, false);
+            x.send(null);
+            
+            resolve(x.responseText);
+        });
+    }
+
+        
+    function addGraficoLines() {
+
+        this.lastIndexTemp = 0;
+
+
+        function atribuirCPU() {
+            getData(`http://localhost:3333/maquina`)
+            .then(data => {
+                let graphFood = [];
+                let dataReadable = JSON.parse(data);
+                let vezes = 45;
+
+                var ultimosDezRegistros = dataReadable.getResponse.slice(0, 8);
+                ultimosDezRegistros.forEach(registro => {
+
+                    let a = new Date();
+                    graphFood.push([
+                        new Date(a.setMinutes(a.getMinutes() - vezes)).toLocaleTimeString(),
+                        registro.cpu
+                    ]);
+                    vezes -= 5;
+                });
+
+                graphFood.unshift(['Horário', 'CPU em uso']);
+
+                google.load("visualization", "1", {packages:["corechart"]});
+                google.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable(graphFood);
+
+                    var options = {
+                        data: {
+                            datasets: [{
+                                borderColor: '#381100'
+                            }]
+                        },
+                        scaleBeginAtZero : true,
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    min: 0,
+                                    beginAtZero: true
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    min: 0,
+                                    beginAtZero: true
+                                }
+                            }]         
+                        },
+                        vAxis: {
+                            title: 'Consumo',
+                            ticks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                        },
+                        title: 'Histórico do uso de CPU',
+                        xAxis: {
+                            title: 'Horário', titleTextStyle: {color: 'black'}
+                        }
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById('chartCPU'));
+                    chart.draw(data, options);
+                }
+            });
+        }
+
+        function atribuirMEMORIA() {
+            getData(`http://localhost:3333/maquina`)
+            .then(data => {
+                let graphFood = [];
+                let dataReadable = JSON.parse(data);
+                let vezes = 45;
+
+                var ultimosDezRegistros = dataReadable.getResponse.slice(0, 8);
+                ultimosDezRegistros.forEach(registro => {
+
+                    let a = new Date();
+                    graphFood.push([
+                        new Date(a.setMinutes(a.getMinutes() - vezes)).toLocaleTimeString(),
+                        registro.memoriaUso
+                    ]);
+                    vezes -= 5;
+                });
+
+                graphFood.unshift(['Horário', 'Memória em uso']);
+
+                google.load("visualization", "1", {packages:["corechart"]});
+                google.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable(graphFood);
+
+                    var options = {
+                        vAxis: {
+                            title: 'Consumo',
+                            ticks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                        },
+                        title: 'Histórico do uso de memória',
+                        xAxis: {
+                            title: 'Horário', titleTextStyle: {color: 'black'}
+                        }
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById('chartMEMORIA'));
+                    chart.draw(data, options);
+                }
+            });
+        }
+
+        function atribuirDISCO() {
+            getData(`http://localhost:3333/maquina`)
+            .then(data => {
+                let graphFood = [];
+                let dataReadable = JSON.parse(data);
+                let vezes = 45;
+
+                var ultimosDezRegistros = dataReadable.getResponse.slice(0, 8);
+                ultimosDezRegistros.forEach(registro => {
+                    let a = new Date();
+
+                    graphFood.push([
+                        new Date(a.setMinutes(a.getMinutes() - vezes)).toLocaleTimeString(),
+                        registro.disco
+                    ]);
+                    vezes -= 5;
+                });
+
+                graphFood.unshift(['Horário', 'Disco em uso']);
+
+                google.load("visualization", "1", {packages:["corechart"]});
+                google.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable(graphFood);
+
+                    var options = {
+                        vAxis: {
+                            title: 'Consumo',
+                            ticks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+                            beginAtZero: true
+                        },
+                        title: 'Histórico do uso de disco',
+                        xAxis: {
+                            title: 'Horário', titleTextStyle: {color: 'black'},
+                            beginAtZero: true
+                        }
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById('chartDISCO'));
+                    chart.draw(data, options);
+                }
+            });
+        }
+
+        atribuirCPU();
+        atribuirMEMORIA();
+        atribuirDISCO();
+        setInterval(() => {
+            atribuirCPU();
+            atribuirMEMORIA();
+            atribuirDISCO();
+        }, 60000);
+    }
+</script>
