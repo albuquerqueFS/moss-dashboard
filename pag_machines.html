@@ -99,7 +99,7 @@
         lista_maquinas.appendChild(card);
         addGraficoLines();
 
-        getData(`https://moss-api-prd.azurewebsites.net/users/cadastrar/maquina/infoMaquina`)
+        getData(`http://localhost:3333/maquina/infoMaquina`)
         .then(data => {
             let api = JSON.parse(data);
             document.getElementById('card_processador').innerHTML = api.retorno.recordset[0].processador; 
@@ -124,7 +124,7 @@
 
 
         function atribuirCPU() {
-            getData(`https://moss-api-prd.azurewebsites.net/users/cadastrar/maquina`)
+            getData(`http://localhost:3333/maquina/`)
             .then(data => {
                 let graphFood = [];
                 let dataReadable = JSON.parse(data);
@@ -187,7 +187,7 @@
         }
 
         function atribuirMEMORIA() {
-            getData(`https://moss-api-prd.azurewebsites.net/users/cadastrar/maquina`)
+            getData(`http://localhost:3333/maquina/`)
             .then(data => {
                 let graphFood = [];
                 let dataReadable = JSON.parse(data);
@@ -230,7 +230,7 @@
         }
 
         function atribuirDISCO() {
-            getData(`https://moss-api-prd.azurewebsites.net/users/cadastrar/maquina`)
+            getData(`http://localhost:3333/maquina/`)
             .then(data => {
                 let graphFood = [];
                 let dataReadable = JSON.parse(data);

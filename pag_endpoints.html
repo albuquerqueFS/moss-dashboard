@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="./css/sidebar.css">
       
     <!-- Chart Imports -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script type="text/javascript" src="http://www.gstatic.com/charts/loader.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 
 </head>
 <body>
@@ -65,7 +65,7 @@
         const lista_apis = document.getElementById('apis_list');
         let endpLista = document.getElementById('list_endpoints');
 
-        getData(`https://moss-api-prd.azurewebsites.net/users/cadastrarapi/${apiHash}`)
+        getData(`http://localhost:3333/api/${apiHash}`)
         .then(data => {
             let api = JSON.parse(data);
 
@@ -76,7 +76,7 @@
         })
         .catch(error => console.error('CATCH', error));
 
-        getData(`https://moss-api-prd.azurewebsites.net/users/cadastrarapi/${apiHash}/endpoint`)
+        getData(`http://localhost:3333/api/${apiHash}/endpoint`)
         .then(data => {
             let endpoints = JSON.parse(data);
             endpoints.retorno.recordset.forEach(endpoint => {
@@ -109,7 +109,7 @@
                 let pStatus = document.createElement('p');
                 let pTOffline = document.createElement('p');
 
-                getData(`https://moss-api-prd.azurewebsites.net/users/cadastrareventos/${endpoint.idEndpoint}`)
+                getData(`http://localhost:3333/eventos/${endpoint.idEndpoint}`)
                 .then(data => {
                     let dataReadable = JSON.parse(data);
 
@@ -236,11 +236,11 @@
         let horariosErrors = [];
 
         function define_graph() {
-            getData(`https://moss-api-prd.azurewebsites.net/users/cadastrareventos/${endpointHash}`)
+            getData(`http://localhost:3333/eventos/${endpointHash}`)
             .then(data => {
                 let dataReadable = JSON.parse(data);
 
-                dataReadable.ge tResponse.forEach(register => {
+                dataReadable.getResponse.forEach(register => {
                     graphFood.push([
                         register.timeAt.split('T')[1].split('.')[0],
                         Number(register.statusCode) == 200 ? 200 : 0,
