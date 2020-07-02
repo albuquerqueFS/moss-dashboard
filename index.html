@@ -141,7 +141,7 @@
         lista_apis.innerHTML = '';
 
         var http = new XMLHttpRequest();
-        http.open('GET', 'http://localhost:3333/api', false);
+        http.open('GET', 'https://moss-api-prd.azurewebsites.net/users/cadastrarapi', false);
         http.send(null);
 
         var obj = JSON.parse(http.responseText);
@@ -221,7 +221,7 @@
                 alertify.success('Endpoint deletado com sucesso!');
                 
                 var http = new XMLHttpRequest();
-                http.open('DELETE', `http://localhost:3333/api/${hash}`, false);
+                http.open('DELETE', `https://moss-api-prd.azurewebsites.net/users/cadastrarapi/${hash}`, false);
                 http.send(null);
 
                 requestApis();
@@ -229,14 +229,14 @@
             () => { });
     }
     
-    // http://localhost:3333/api/create/nome/site
+    // https://moss-api-prd.azurewebsites.net/users/cadastrarapi/create/nome/site
 
     function registrarAPI() {
         var nomeAPI = document.getElementById('api_titulo').value;
         var baseurlAPI = document.getElementById('api_baseURL').value;
 
         var http = new XMLHttpRequest();
-        http.open('GET', `http://localhost:3333/api/create/${nomeAPI}/${encodeURIComponent(baseurlAPI)}`, false);
+        http.open('GET', `https://moss-api-prd.azurewebsites.net/users/cadastrarapi/create/${nomeAPI}/${encodeURIComponent(baseurlAPI)}`, false);
         http.send(null);
 
         var obj = JSON.parse(http.responseText);
