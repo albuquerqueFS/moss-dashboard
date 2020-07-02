@@ -65,7 +65,7 @@
         const lista_apis = document.getElementById('apis_list');
         let endpLista = document.getElementById('list_endpoints');
 
-        getData(`http://localhost:3333/api/${apiHash}`)
+        getData(`https://moss-api-prd.azurewebsites.net/users/cadastrarapi/${apiHash}`)
         .then(data => {
             let api = JSON.parse(data);
 
@@ -76,7 +76,7 @@
         })
         .catch(error => console.error('CATCH', error));
 
-        getData(`http://localhost:3333/api/${apiHash}/endpoint`)
+        getData(`https://moss-api-prd.azurewebsites.net/users/cadastrarapi/${apiHash}/endpoint`)
         .then(data => {
             let endpoints = JSON.parse(data);
             endpoints.retorno.recordset.forEach(endpoint => {
@@ -109,7 +109,7 @@
                 let pStatus = document.createElement('p');
                 let pTOffline = document.createElement('p');
 
-                getData(`http://localhost:3333/eventos/${endpoint.idEndpoint}`)
+                getData(`https://moss-api-prd.azurewebsites.net/users/cadastrareventos/${endpoint.idEndpoint}`)
                 .then(data => {
                     let dataReadable = JSON.parse(data);
 
@@ -227,9 +227,6 @@
 
         let listaEndp = document.getElementById('list_endpoints');
 
-        this.lastIndexTemp = 0;
-        this.time = 0;
-
         let graphFood = [];
         
         let graphPositives = [];
@@ -239,7 +236,7 @@
         let horariosErrors = [];
 
         function define_graph() {
-            getData(`http://localhost:3333/eventos/${endpointHash}`)
+            getData(`https://moss-api-prd.azurewebsites.net/users/cadastrareventos/${endpointHash}`)
             .then(data => {
                 let dataReadable = JSON.parse(data);
 
